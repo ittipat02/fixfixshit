@@ -1,5 +1,6 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { post } from '../../utils/sdk';
 
 import { Navbar, Nav, NavDropdown, Col, Row, Image, Button, Tabs, } from "react-bootstrap";
 //import "bootstrap/dist/css/bootstrap.min.css";
@@ -19,9 +20,40 @@ const Home = () => {
   const history = useHistory();
   const { user, setUser } = useContext(UserContext);
 
-  const handleTodo = useCallback(() => {
-    todo();
-  }, [setUser, history]);
+  const [inputs, setInputs] = useState({});
+
+  const [check, setCheck] = useState(false);
+
+  const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    console.log(inputs.description)
+    setInputs(values => ({ ...values, [name]: value }))
+    console.log("after change" + inputs.description)
+  }
+
+  const shandleCheck = (e) => {
+    console.log("in handle check")
+    console.log(check)
+    const prev = e.target.value;
+    setCheck(!(prev));
+  }
+  const handleCheck = () => {
+    console.log(check)
+    setCheck(!check)
+  }
+
+
+  const handleTodo = (event) => {
+    event.preventDefault();
+    const data = {
+      title: inputs.title,
+      description: inputs.description,
+      completed: check,
+    };
+    console.log(inputs.description)
+    todo(data);
+  };
 
   const handleLogout = useCallback(() => {
     logout().then(() => {
@@ -178,6 +210,45 @@ const Home = () => {
           </Col>
         </Col>
       </Row >
+      <form onSubmit={handleTodo}>
+        <label>Title:
+          <input
+            type="text"
+            name="title"
+            value={inputs.title || ""}
+            onChange={handleChange}
+          />
+        </label>
+
+        <br></br>
+
+        <label>Description:
+          <input
+            type="text"
+            name="description"
+            value={inputs.description || ""}
+            onChange={handleChange}
+          />
+        </label>
+
+        <br></br>
+
+        <div class="form-check">
+          <input class="form-check-input" 
+                type="checkbox"
+                value=""
+                id="flexCheckChecked"
+                onChange={handleCheck}
+                />
+            <label class="form-check-label" for="flexCheckChecked">
+              Checked checkbox
+            </label>
+        </div>
+
+        <br></br>
+
+        <input type="submit" />
+      </form>
     </Container >
 
   );
